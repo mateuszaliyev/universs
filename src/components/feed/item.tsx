@@ -75,7 +75,7 @@ export const FeedItemPreview = ({
         },
       },
     );
-  }, [userFeedItem.data?.id, userFeedItem.data?.readLater]);
+  }, [userFeedItem.data]);
 
   return (
     <article

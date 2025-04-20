@@ -8,8 +8,7 @@ export {
   TooltipTrigger,
 } from "@radix-ui/react-tooltip";
 
-export interface TooltipContentProps
-  extends ComponentPropsWithClassName<typeof Content> {}
+export type TooltipContentProps = ComponentPropsWithClassName<typeof Content>;
 
 export const TooltipContent = ({
   className,

@@ -95,7 +95,7 @@ export const Feed = ({ id }: { id: FeedType["id"] }) => {
         message: "Refreshed successfully",
       },
     });
-  }, [feed.data?.id, feed.data?.url]);
+  }, [feed.data?.id, feed.data?.name, feed.data?.url]);
 
   useEffect(() => {
     if (!feed.data && !feed.isPending) notFound();

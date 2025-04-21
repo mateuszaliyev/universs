@@ -9,7 +9,7 @@ const DashboardPage = () => (
     <section>
       <Container>
         <Title>All</Title>
-        <Lead>Posts from all your feeds in one place</Lead>
+        <Lead>Everything new from the sources you follow</Lead>
         <AllFeedItems />
       </Container>
     </section>

@@ -147,9 +147,8 @@ export const database = {
                 if (!user) return [];
 
                 const userFeeds = await client.userFeeds
-                  .where("userId")
-                  .equals(user.id)
-                  .toArray();
+                  .where({ userId: user.id })
+                  .sortBy("name");
 
                 if (!userFeeds.length) return [];
 
@@ -219,9 +218,13 @@ export const database = {
               id: (id: FeedItem["id"]) =>
                 client.transaction(
                   "r",
-                  client.feedItems,
-                  client.userFeedItems,
-                  client.users,
+                  [
+                    client.feedItems,
+                    client.feeds,
+                    client.userFeedItems,
+                    client.userFeeds,
+                    client.users,
+                  ],
                   async () => {
                     const user = await database.users.current.get();
 
@@ -233,6 +236,16 @@ export const database = {
 
                     if (!feedItem) return;
 
+                    const feed = await client.feeds
+                      .where({ id: feedItem.feedId })
+                      .first();
+
+                    const userFeed = feed
+                      ? await client.userFeeds
+                          .where({ feedId: feed.id, userId: user.id })
+                          .first()
+                      : undefined;
+
                     const userFeedItem = await client.userFeedItems
                       .where({
                         feedItemId: feedItem.id,
@@ -243,6 +256,7 @@ export const database = {
                     return {
                       ...feedItem,
                       favorite: userFeedItem?.favorite,
+                      feed: { ...feed, name: userFeed?.name },
                       readLater: userFeedItem?.readLater,
                     };
                   },

@@ -8,16 +8,25 @@ import { useForm } from "@tanstack/react-form";
 import * as z from "@zod/mini";
 
 import { Button } from "@/components/button";
-import { FeedItemPreview } from "@/components/feed/item";
+import {
+  FeedItemPreview,
+  FeedItemPreviewList,
+} from "@/components/feed/item/preview";
 import { Field, FieldError, FieldInput, FieldLabel } from "@/components/field";
+import { Form } from "@/components/form";
 import { ExternalLinkIcon } from "@/components/icons/link";
 import { PencilLineIcon } from "@/components/icons/pencil";
 import { RotateClockwiseIcon } from "@/components/icons/rotate";
 import { Link } from "@/components/link";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/popover";
 import { toast, TOAST_DEFAULT_ERROR_MESSAGE } from "@/components/toast";
-import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/tooltip";
-import { Lead, Title } from "@/components/typography";
+import {
+  Lead,
+  Title,
+  TitleOption,
+  TitleOptions,
+  TitleOptionsContainer,
+} from "@/components/typography";
 
 import { database } from "@/database";
 import type { Feed as FeedType } from "@/database/client";
@@ -25,16 +34,7 @@ import { useFeed } from "@/database/hooks";
 
 import { getFeedByUrl } from "@/server/actions";
 
-import { cva } from "@/utilities/classname";
-
-const option = cva({
-  base: "hocus-visible:bg-gray-200 dark:hocus-visible:bg-gray-800 flex size-8 cursor-pointer items-center justify-center rounded-md transition outline-none",
-});
-
-const optionIcon = cva({
-  base: "size-5 text-gray-500 dark:text-gray-400",
-  variants: { fill: { true: "fill-current" } },
-});
+import { APPLICATION_NAME } from "@/utilities/application";
 
 const nameSchema = z.string().check(
   z.maxLength(31, {
@@ -103,24 +103,23 @@ export const Feed = ({ id }: { id: FeedType["id"] }) => {
 
   if (feed.isPending) return null;
 
+  if (!feed.data) notFound();
+
+  document.title = `${feed.data.name} | ${APPLICATION_NAME}`;
+
   return (
     <>
-      <div className="flex flex-wrap items-center justify-between gap-8">
+      <TitleOptionsContainer className="flex-wrap">
         <Title>{feed.data?.name}</Title>
-        <div className="flex items-center gap-2">
+        <TitleOptions>
           <Popover onOpenChange={setPopoverOpen} open={popoverOpen}>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <PopoverTrigger className={option()}>
-                  <PencilLineIcon className={optionIcon()} />
-                  <span className="sr-only">Rename</span>
-                </PopoverTrigger>
-              </TooltipTrigger>
-              <TooltipContent>Rename</TooltipContent>
-            </Tooltip>
+            <PopoverTrigger asChild>
+              <TitleOption label="Rename">
+                <PencilLineIcon />
+              </TitleOption>
+            </PopoverTrigger>
             <PopoverContent>
-              <form
-                className="flex flex-col gap-4"
+              <Form
                 onSubmit={(event) => {
                   event.preventDefault();
                   event.stopPropagation();
@@ -149,35 +148,27 @@ export const Feed = ({ id }: { id: FeedType["id"] }) => {
                   )}
                 </form.Field>
                 <Button disabled={form.state.isSubmitting}>Rename</Button>
-              </form>
+              </Form>
             </PopoverContent>
           </Popover>
-          <Tooltip>
-            <TooltipTrigger className={option()} onClick={refresh}>
-              <RotateClockwiseIcon className={optionIcon()} />
-              <span className="sr-only">Refresh</span>
-            </TooltipTrigger>
-            <TooltipContent>Refresh</TooltipContent>
-          </Tooltip>
+          <TitleOption label="Refresh" onClick={refresh}>
+            <RotateClockwiseIcon />
+          </TitleOption>
           {feed.data?.link && (
-            <Tooltip>
-              <TooltipTrigger asChild className={option()}>
-                <Link href={feed.data.link} target="_blank">
-                  <ExternalLinkIcon className={optionIcon()} />
-                  <span className="sr-only">Visit the website</span>
-                </Link>
-              </TooltipTrigger>
-              <TooltipContent>Visit the website</TooltipContent>
-            </Tooltip>
+            <TitleOption asChild label="Visit the website">
+              <Link href={feed.data.link} target="_blank">
+                <ExternalLinkIcon />
+              </Link>
+            </TitleOption>
           )}
-        </div>
-      </div>
+        </TitleOptions>
+      </TitleOptionsContainer>
       {feed.data?.description && <Lead>{feed.data.description}</Lead>}
-      <div className="mt-16 flex max-w-prose flex-col gap-8">
+      <FeedItemPreviewList>
         {feed.data?.items.map((item) => (
           <FeedItemPreview item={item} key={item.id} />
         ))}
-      </div>
+      </FeedItemPreviewList>
     </>
   );
 };

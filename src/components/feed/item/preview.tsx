@@ -1,15 +1,12 @@
 "use client";
 
-import { useCallback } from "react";
-
+import { FeedItemDetails } from "@/components/feed/item/details";
 import { BookmarkIcon } from "@/components/icons/bookmark";
 import { StarIcon } from "@/components/icons/star";
 import { Link } from "@/components/link";
-import { toast, TOAST_DEFAULT_ERROR_MESSAGE } from "@/components/toast";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/tooltip";
 import { Heading } from "@/components/typography";
 
-import { database } from "@/database";
 import type { FeedItem } from "@/database/client";
 import { useUserFeedItem } from "@/database/hooks";
 
@@ -35,47 +32,9 @@ export const FeedItemPreview = ({
   item,
   ...props
 }: FeedItemPreviewProps) => {
-  const userFeedItem = useUserFeedItem(item.id);
-
-  const handleFavorite = useCallback(() => {
-    if (typeof userFeedItem.data === "undefined") return;
-
-    toast.promise(
-      database.users.current.feeds.items.update(userFeedItem.data.id, {
-        favorite: userFeedItem.data.favorite ? 0 : 1,
-      }),
-      {
-        error: TOAST_DEFAULT_ERROR_MESSAGE,
-        loading: "Adding to favorites...",
-        success: {
-          description: userFeedItem.data.title,
-          message: userFeedItem.data.favorite
-            ? "Removed from favorites"
-            : "Added to favorites",
-        },
-      },
-    );
-  }, [userFeedItem.data]);
-
-  const handleReadLater = useCallback(() => {
-    if (typeof userFeedItem.data === "undefined") return;
-
-    toast.promise(
-      database.users.current.feeds.items.update(userFeedItem.data.id, {
-        readLater: userFeedItem.data.readLater ? 0 : 1,
-      }),
-      {
-        error: TOAST_DEFAULT_ERROR_MESSAGE,
-        loading: "Adding to read later list...",
-        success: {
-          description: userFeedItem.data.title,
-          message: userFeedItem.data.readLater
-            ? "Removed from read later list"
-            : "Added to read later list",
-        },
-      },
-    );
-  }, [userFeedItem.data]);
+  const { toggleFavorite, toggleReadLater, userFeedItem } = useUserFeedItem(
+    item.id,
+  );
 
   return (
     <article
@@ -96,7 +55,7 @@ export const FeedItemPreview = ({
           {userFeedItem.data && (
             <>
               <Tooltip>
-                <TooltipTrigger className={option()} onClick={handleReadLater}>
+                <TooltipTrigger className={option()} onClick={toggleReadLater}>
                   <BookmarkIcon
                     className={optionIcon({
                       fill: Boolean(userFeedItem.data.readLater),
@@ -115,7 +74,7 @@ export const FeedItemPreview = ({
                 </TooltipContent>
               </Tooltip>
               <Tooltip>
-                <TooltipTrigger className={option()} onClick={handleFavorite}>
+                <TooltipTrigger className={option()} onClick={toggleFavorite}>
                   <StarIcon
                     className={optionIcon({
                       fill: Boolean(userFeedItem.data.favorite),
@@ -138,15 +97,7 @@ export const FeedItemPreview = ({
         </div>
       </div>
       <p className="text-xs text-gray-500 dark:text-gray-400">
-        {item.author && <span>by {item.author}</span>}
-        {item.author && item.isoDate && " / "}
-        {item.isoDate && (
-          <time dateTime={item.isoDate}>
-            {new Date(item.isoDate).toLocaleDateString("en", {
-              dateStyle: "medium",
-            })}
-          </time>
-        )}
+        <FeedItemDetails item={item} />
       </p>
       <p className="line-clamp-3 text-sm text-gray-500 dark:text-gray-400">
         {item.contentSnippet}
@@ -154,3 +105,13 @@ export const FeedItemPreview = ({
     </article>
   );
 };
+
+export const FeedItemPreviewList = ({
+  className,
+  ...props
+}: React.ComponentProps<"div">) => (
+  <div
+    className={cx("mt-16 flex max-w-prose flex-col gap-8", className)}
+    {...props}
+  />
+);

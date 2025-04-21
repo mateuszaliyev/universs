@@ -7,8 +7,8 @@ import * as z from "@zod/mini";
 
 import { Button } from "@/components/button";
 import { Field, FieldError, FieldInput, FieldLabel } from "@/components/field";
+import { Form } from "@/components/form";
 import { toast, TOAST_DEFAULT_ERROR_MESSAGE } from "@/components/toast";
-import { Lead, Title } from "@/components/typography";
 
 import { database } from "@/database";
 
@@ -38,40 +38,36 @@ export const CreateAccountForm = () => {
   });
 
   return (
-    <form
-      className="mt-8 mb-20"
+    <Form
+      className="mt-8"
       onSubmit={(event) => {
         event.preventDefault();
         event.stopPropagation();
         form.handleSubmit();
       }}
     >
-      <Title>Create account</Title>
-      <Lead>Get started by creating your new account.</Lead>
-      <div className="mt-8 flex flex-col gap-4">
-        <form.Field
-          name="name"
-          validators={{
-            onChange: ({ value }) =>
-              nameSchema
-                .safeParse(value)
-                ?.error?.issues.map((issue) => issue.message),
-          }}
-        >
-          {(field) => (
-            <Field>
-              <FieldLabel field={field}>Username</FieldLabel>
-              <FieldInput
-                disabled={form.state.isSubmitting}
-                field={field}
-                placeholder="Aaron Swartz"
-              />
-              <FieldError field={field} />
-            </Field>
-          )}
-        </form.Field>
-        <Button disabled={form.state.isSubmitting}>Create account</Button>
-      </div>
-    </form>
+      <form.Field
+        name="name"
+        validators={{
+          onChange: ({ value }) =>
+            nameSchema
+              .safeParse(value)
+              ?.error?.issues.map((issue) => issue.message),
+        }}
+      >
+        {(field) => (
+          <Field>
+            <FieldLabel field={field}>Username</FieldLabel>
+            <FieldInput
+              disabled={form.state.isSubmitting}
+              field={field}
+              placeholder="Aaron Swartz"
+            />
+            <FieldError field={field} />
+          </Field>
+        )}
+      </form.Field>
+      <Button disabled={form.state.isSubmitting}>Create account</Button>
+    </Form>
   );
 };

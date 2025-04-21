@@ -64,8 +64,54 @@ export const useUserCount = () => useLiveQuery(() => database.users.count());
 export const useUserFavorites = () =>
   useLiveQuery(database.users.current.feeds.items.get.favorites);
 
-export const useUserFeedItem = (id: FeedItem["id"]) =>
-  useLiveQuery(() => database.users.current.feeds.items.get.by.id(id), [id]);
+export const useUserFeedItem = (id: FeedItem["id"]) => {
+  const userFeedItem = useLiveQuery(
+    () => database.users.current.feeds.items.get.by.id(id),
+    [id],
+  );
+
+  const toggleFavorite = useCallback(() => {
+    if (typeof userFeedItem.data === "undefined") return;
+
+    toast.promise(
+      database.users.current.feeds.items.update(userFeedItem.data.id, {
+        favorite: userFeedItem.data.favorite ? 0 : 1,
+      }),
+      {
+        error: TOAST_DEFAULT_ERROR_MESSAGE,
+        loading: "Adding to favorites...",
+        success: {
+          description: userFeedItem.data.title,
+          message: userFeedItem.data.favorite
+            ? "Removed from favorites"
+            : "Added to favorites",
+        },
+      },
+    );
+  }, [userFeedItem.data]);
+
+  const toggleReadLater = useCallback(() => {
+    if (typeof userFeedItem.data === "undefined") return;
+
+    toast.promise(
+      database.users.current.feeds.items.update(userFeedItem.data.id, {
+        readLater: userFeedItem.data.readLater ? 0 : 1,
+      }),
+      {
+        error: TOAST_DEFAULT_ERROR_MESSAGE,
+        loading: "Adding to read later list...",
+        success: {
+          description: userFeedItem.data.title,
+          message: userFeedItem.data.readLater
+            ? "Removed from read later list"
+            : "Added to read later list",
+        },
+      },
+    );
+  }, [userFeedItem.data]);
+
+  return { toggleFavorite, toggleReadLater, userFeedItem };
+};
 
 export const useUserFeedItems = () =>
   useLiveQuery(database.users.current.feeds.items.get.all);

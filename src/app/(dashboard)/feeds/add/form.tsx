@@ -78,7 +78,7 @@ export const AddFeedForm = () => {
             <FieldInput
               disabled={form.state.isSubmitting}
               field={field}
-              placeholder="https://example.com/rss.xml"
+              placeholder="https://theverge.com/rss/index.xml"
             />
             <FieldError field={field} />
           </Field>

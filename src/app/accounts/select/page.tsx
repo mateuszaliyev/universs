@@ -7,9 +7,7 @@ import { DatabaseProvider } from "@/components/database/provider";
 import { UniverssIcon } from "@/components/icons/universs";
 import { Lead, Title } from "@/components/typography";
 
-export const metadata: Metadata = {
-  title: "Select account",
-};
+export const metadata: Metadata = { title: "Select account" };
 
 const SelectAccountPage = () => (
   <DatabaseProvider>
@@ -18,7 +16,9 @@ const SelectAccountPage = () => (
         <UniverssIcon className="size-12" />
         <div className="mt-8 mb-20">
           <Title>Select account</Title>
-          <Lead>Get started by selecting your account.</Lead>
+          <Lead className="text-balance">
+            Choose the account you would like to use to continue
+          </Lead>
           <AccountList />
         </div>
       </Container>

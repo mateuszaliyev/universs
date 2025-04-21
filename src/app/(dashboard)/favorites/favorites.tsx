@@ -1,6 +1,9 @@
 "use client";
 
-import { FeedItemPreview } from "@/components/feed/item";
+import {
+  FeedItemPreview,
+  FeedItemPreviewList,
+} from "@/components/feed/item/preview";
 
 import { useUserFavorites } from "@/database/hooks";
 
@@ -10,10 +13,10 @@ export const Favorites = () => {
   if (!favorites.data?.length) return null;
 
   return (
-    <div className="mt-16 flex max-w-prose flex-col gap-8">
+    <FeedItemPreviewList>
       {favorites.data.map((item) => (
         <FeedItemPreview item={item} key={item.id} />
       ))}
-    </div>
+    </FeedItemPreviewList>
   );
 };

@@ -1,6 +1,8 @@
 @import "tailwindcss";
 @import "./animate.css";
 
+@plugin "@tailwindcss/typography";
+
 @theme inline {
   --color-*: initial;
   --font-*: initial;

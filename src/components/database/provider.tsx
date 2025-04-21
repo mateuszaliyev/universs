@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 
 import { redirect, usePathname } from "next/navigation";
 
-import { useUserCount } from "@/database/hooks";
+import { useUser, useUserCount } from "@/database/hooks";
 
 import { paths } from "@/utilities/url";
 
@@ -15,15 +15,27 @@ export const DatabaseProvider = ({
 }) => {
   const [show, setShow] = useState(false);
   const pathname = usePathname();
+
+  const { user } = useUser();
   const { data: userCount, isPending } = useUserCount();
 
   useEffect(() => {
-    if (userCount) setShow(true);
+    console.log({ isPending, pathname, user, userCount });
+
+    if (isPending) return;
+
+    if (typeof userCount === "undefined") return;
+
+    if (user || pathname === paths.accounts.select()) return setShow(true);
+
+    if (!user && userCount > 0 && pathname !== paths.accounts.select()) {
+      redirect(paths.accounts.select());
+    }
 
     if (userCount === 0 && pathname !== paths.accounts.create()) {
       redirect(paths.accounts.create());
     }
-  }, [pathname, userCount]);
+  }, [isPending, pathname, user, userCount]);
 
   if (isPending) return null;
 

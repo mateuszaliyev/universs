@@ -1,7 +1,7 @@
 import { Slot, type AsChild } from "@/components/slot";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/tooltip";
 
-import { cx } from "@/utilities/classname";
+import { cva, cx, type VariantProps } from "@/utilities/classname";
 
 export interface HeadingProps extends React.ComponentProps<"h2">, AsChild {}
 
@@ -10,10 +10,22 @@ export interface LeadProps extends React.ComponentProps<"p">, AsChild {}
 export interface TitleProps extends React.ComponentProps<"h1">, AsChild {}
 
 export interface TitleOptionProps
-  extends React.ComponentProps<"button">,
-    AsChild {
+  extends Omit<React.ComponentProps<"button">, "color">,
+    AsChild,
+    VariantProps<typeof titleOption> {
   label: React.ReactNode;
 }
+
+const titleOption = cva({
+  base: "hocus-visible:bg-gray-200 dark:hocus-visible:bg-gray-800 flex size-8 cursor-pointer items-center justify-center rounded-md transition outline-none [&>svg]:size-5",
+  defaultVariants: { color: "secondary" },
+  variants: {
+    color: {
+      destructive: "text-destructive-500",
+      secondary: "text-gray-500 dark:text-gray-400",
+    },
+  },
+});
 
 export const Heading = ({ asChild, className, ...props }: TitleProps) => {
   const Component = asChild ? Slot : "h2";
@@ -68,6 +80,7 @@ export const Title = ({ asChild, className, ...props }: TitleProps) => {
 export const TitleOption = ({
   asChild,
   className,
+  color,
   label: tooltip,
   ...props
 }: TitleOptionProps) => {
@@ -76,13 +89,7 @@ export const TitleOption = ({
   return (
     <Tooltip>
       <TooltipTrigger asChild>
-        <Component
-          className={cx(
-            "hocus-visible:bg-gray-200 dark:hocus-visible:bg-gray-800 flex size-8 cursor-pointer items-center justify-center rounded-md text-gray-500 transition outline-none dark:text-gray-400 [&>svg]:size-5",
-            className,
-          )}
-          {...props}
-        />
+        <Component className={titleOption({ className, color })} {...props} />
       </TooltipTrigger>
       <TooltipContent>{tooltip}</TooltipContent>
     </Tooltip>
@@ -93,7 +100,7 @@ export const TitleOptions = ({
   className,
   ...props
 }: React.ComponentProps<"div">) => (
-  <div className={cx("flex items-center gap-2", className)} {...props} />
+  <div className={cx("mt-1.5 flex items-center gap-2", className)} {...props} />
 );
 
 export const TitleOptionsContainer = ({
@@ -101,7 +108,10 @@ export const TitleOptionsContainer = ({
   ...props
 }: React.ComponentProps<"div">) => (
   <div
-    className={cx("flex items-center justify-between gap-8", className)}
+    className={cx(
+      "flex items-start justify-between gap-x-8 gap-y-2",
+      className,
+    )}
     {...props}
   />
 );

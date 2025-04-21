@@ -2,12 +2,23 @@
 
 import { useCallback, useEffect, useState } from "react";
 
-import { notFound } from "next/navigation";
+import { notFound, useRouter } from "next/navigation";
 
 import { useForm } from "@tanstack/react-form";
 import * as z from "@zod/mini";
 
 import { Button } from "@/components/button";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/dialog/alert";
 import {
   FeedItemPreview,
   FeedItemPreviewList,
@@ -17,6 +28,7 @@ import { Form } from "@/components/form";
 import { ExternalLinkIcon } from "@/components/icons/link";
 import { PencilLineIcon } from "@/components/icons/pencil";
 import { RotateClockwiseIcon } from "@/components/icons/rotate";
+import { TrashIcon } from "@/components/icons/trash";
 import { Link } from "@/components/link";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/popover";
 import { toast, TOAST_DEFAULT_ERROR_MESSAGE } from "@/components/toast";
@@ -35,6 +47,7 @@ import { useFeed } from "@/database/hooks";
 import { getFeedByUrl } from "@/server/actions";
 
 import { APPLICATION_NAME } from "@/utilities/application";
+import { paths } from "@/utilities/url";
 
 const nameSchema = z.string().check(
   z.maxLength(31, {
@@ -45,6 +58,8 @@ const nameSchema = z.string().check(
 
 export const Feed = ({ id }: { id: FeedType["id"] }) => {
   const [popoverOpen, setPopoverOpen] = useState(false);
+
+  const router = useRouter();
 
   const feed = useFeed(id);
 
@@ -76,6 +91,22 @@ export const Feed = ({ id }: { id: FeedType["id"] }) => {
       }),
   });
 
+  const deleteFeed = useCallback(async () => {
+    const name = feed.data?.name;
+
+    const deleteFeed = async () => {
+      if (!feed.data?.id) throw new Error(TOAST_DEFAULT_ERROR_MESSAGE);
+      return database.feeds.delete(feed.data.id);
+    };
+
+    toast.promise(deleteFeed, {
+      error: TOAST_DEFAULT_ERROR_MESSAGE,
+      finally: () => router.replace(paths.dashboard()),
+      loading: "Deleting feed...",
+      success: { description: name, message: "Feed deleted succesfully" },
+    });
+  }, [feed.data?.id, feed.data?.name, router]);
+
   const refresh = useCallback(() => {
     const refresh = async () => {
       if (!feed.data?.url) throw new Error(TOAST_DEFAULT_ERROR_MESSAGE);
@@ -89,10 +120,10 @@ export const Feed = ({ id }: { id: FeedType["id"] }) => {
 
     toast.promise(refresh, {
       error: TOAST_DEFAULT_ERROR_MESSAGE,
-      loading: "Refreshing...",
+      loading: "Refreshing feed...",
       success: {
         description: feed.data?.name,
-        message: "Refreshed successfully",
+        message: "Feed refreshed successfully",
       },
     });
   }, [feed.data?.id, feed.data?.name, feed.data?.url]);
@@ -110,7 +141,10 @@ export const Feed = ({ id }: { id: FeedType["id"] }) => {
   return (
     <>
       <TitleOptionsContainer className="flex-wrap">
-        <Title>{feed.data?.name}</Title>
+        <div>
+          <Title>{feed.data?.name}</Title>
+          {feed.data?.description && <Lead>{feed.data.description}</Lead>}
+        </div>
         <TitleOptions>
           <Popover onOpenChange={setPopoverOpen} open={popoverOpen}>
             <PopoverTrigger asChild>
@@ -161,9 +195,36 @@ export const Feed = ({ id }: { id: FeedType["id"] }) => {
               </Link>
             </TitleOption>
           )}
+          <AlertDialog>
+            <AlertDialogTrigger asChild>
+              <TitleOption color="destructive" label="Delete">
+                <TrashIcon />
+              </TitleOption>
+            </AlertDialogTrigger>
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+                <AlertDialogDescription>
+                  This action cannot be undone. This will permanently delete
+                  feed{" "}
+                  <strong className="font-medium tracking-tight text-white">
+                    {feed.data.name}
+                  </strong>{" "}
+                  and remove its data from your browser.
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel asChild>
+                  <Button>Cancel</Button>
+                </AlertDialogCancel>
+                <AlertDialogAction asChild onClick={deleteFeed}>
+                  <Button color="destructive">Delete feed</Button>
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
         </TitleOptions>
       </TitleOptionsContainer>
-      {feed.data?.description && <Lead>{feed.data.description}</Lead>}
       <FeedItemPreviewList>
         {feed.data?.items.map((item) => (
           <FeedItemPreview item={item} key={item.id} />

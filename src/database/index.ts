@@ -19,6 +19,38 @@ interface CreateUserParameters
 
 export const database = {
   feeds: {
+    delete: (feedId: Feed["id"]) =>
+      client.transaction(
+        "rw",
+        [
+          client.feedItems,
+          client.feeds,
+          client.userFeedItems,
+          client.userFeeds,
+          client.users,
+        ],
+        async () => {
+          const feedItems = await client.feedItems.where({ feedId }).toArray();
+
+          const userFeedItems = await client.userFeedItems
+            .where("feedItemId")
+            .anyOf(feedItems.map((feedItem) => feedItem.id))
+            .toArray();
+
+          const userFeed = await client.userFeeds.where({ feedId }).first();
+
+          await client.userFeedItems.bulkDelete(
+            userFeedItems.map(({ id }) => id),
+          );
+
+          await client.feedItems.bulkDelete(feedItems.map(({ id }) => id));
+
+          if (userFeed) await client.userFeeds.delete(userFeed.id);
+
+          await client.feeds.delete(feedId);
+        },
+      ),
+
     get: {
       by: {
         id: (id: Feed["id"]) =>

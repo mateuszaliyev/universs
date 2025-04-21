@@ -15,12 +15,9 @@ import { paths } from "@/utilities/url";
 export const AccountList = () => {
   const { isPending, setCurrent, users } = useUsers();
 
-  const createClickHandler = useCallback(
+  const handleClick = useCallback(
     (...parameters: Parameters<typeof setCurrent>) =>
-      () => {
-        setCurrent(...parameters);
-        redirect(paths.dashboard());
-      },
+      setCurrent(...parameters).then(() => redirect(paths.dashboard())),
     [setCurrent],
   );
 
@@ -30,7 +27,7 @@ export const AccountList = () => {
     <ul className="-mx-2 mt-8 grid grid-cols-1 gap-4 sm:grid-cols-2">
       {users?.map((user) => (
         <li key={user.id}>
-          <UserButton onClick={createClickHandler(user)} user={user} />
+          <UserButton onClick={() => handleClick(user)} user={user} />
         </li>
       ))}
       <li>

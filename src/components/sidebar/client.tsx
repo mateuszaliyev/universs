@@ -43,6 +43,7 @@ import {
   SheetTitle,
 } from "@/components/sheet";
 import {
+  sidebarAction,
   SidebarFooter,
   SidebarMenu,
   SidebarMenuItem,
@@ -77,6 +78,10 @@ import { useMedia } from "@/utilities/hooks/media";
 import { THEMES, type Theme } from "@/utilities/hooks/theme";
 import { paths } from "@/utilities/url";
 
+type CloseOnClick = {
+  closeOnClick?: boolean;
+};
+
 type SidebarContextProps = {
   isMobile: boolean;
   open: boolean;
@@ -87,11 +92,10 @@ type SidebarContextProps = {
   toggleSidebar: () => void;
 };
 
-interface SidebarProps extends React.ComponentProps<"div"> {
-  collapsible?: "icon" | "none" | "offcanvas";
-  side?: "left" | "right";
-  variant?: "floating" | "inset" | "sidebar";
-}
+export interface SidebarGroupActionProps
+  extends ComponentPropsWithClassName<"button">,
+    AsChild,
+    CloseOnClick {}
 
 interface SidebarInsetProps
   extends ComponentPropsWithClassName<"main">,
@@ -100,9 +104,16 @@ interface SidebarInsetProps
 interface SidebarMenuButtonProps
   extends ComponentPropsWithClassName<"button">,
     AsChild,
+    CloseOnClick,
     VariantProps<typeof sidebarMenuButton> {
   isActive?: boolean;
   tooltip?: string | TooltipContentProps;
+}
+
+interface SidebarProps extends React.ComponentProps<"div"> {
+  collapsible?: "icon" | "none" | "offcanvas";
+  side?: "left" | "right";
+  variant?: "floating" | "inset" | "sidebar";
 }
 
 interface SidebarProviderProps extends ComponentPropsWithClassName<"div"> {
@@ -272,6 +283,34 @@ export const SidebarFeeds = () => {
   );
 };
 
+export const SidebarGroupAction = ({
+  asChild,
+  className,
+  closeOnClick = true,
+  onClick,
+  ...props
+}: SidebarGroupActionProps) => {
+  const { setSheetOpen } = useSidebar();
+
+  const Component = useMemo(() => (asChild ? Slot : "button"), [asChild]);
+
+  const handleClick = useCallback<NonNullable<typeof onClick>>(
+    (event) => {
+      if (closeOnClick) setSheetOpen(false);
+      onClick?.(event);
+    },
+    [closeOnClick, onClick, setSheetOpen],
+  );
+
+  return (
+    <Component
+      className={sidebarAction({ className, variant: "group" })}
+      onClick={handleClick}
+      {...props}
+    />
+  );
+};
+
 export const SidebarInset = ({
   asChild,
   className,
@@ -338,17 +377,30 @@ export const SidebarMenuButton = ({
 const SidebarMenuButtonInternal = ({
   asChild,
   className,
+  closeOnClick = true,
   isActive,
+  onClick,
   size,
   ...props
 }: SidebarMenuButtonProps) => {
+  const { setSheetOpen } = useSidebar();
+
   const Component = useMemo(() => (asChild ? Slot : "button"), [asChild]);
+
+  const handleClick = useCallback<NonNullable<typeof onClick>>(
+    (event) => {
+      if (closeOnClick) setSheetOpen(false);
+      onClick?.(event);
+    },
+    [closeOnClick, setSheetOpen],
+  );
 
   return (
     <Component
       className={sidebarMenuButton({ className, size })}
       data-active={isActive}
       data-size={size}
+      onClick={handleClick}
       {...props}
     />
   );
@@ -508,6 +560,7 @@ export const SidebarUser = () => {
               <DropdownMenuTrigger asChild>
                 <SidebarMenuButton
                   className="group-data-[collapsible=icon]:p-0"
+                  closeOnClick={false}
                   size="lg"
                   tooltip={user.name}
                 >

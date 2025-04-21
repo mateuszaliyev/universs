@@ -11,7 +11,6 @@ import { Link } from "@/components/link";
 import {
   SidebarContent,
   SidebarGroup,
-  SidebarGroupAction,
   SidebarGroupLabel,
   SidebarHeader,
   SidebarMenu,
@@ -20,6 +19,7 @@ import {
 import {
   Sidebar,
   SidebarFeeds,
+  SidebarGroupAction,
   SidebarMenuButton,
   SidebarProvider,
   SidebarRail,

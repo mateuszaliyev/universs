@@ -9,10 +9,6 @@ import {
   type VariantProps,
 } from "@/utilities/classname";
 
-export interface SidebarGroupActionProps
-  extends ComponentPropsWithClassName<"button">,
-    AsChild {}
-
 export interface SidebarGroupLabelProps
   extends ComponentPropsWithClassName<"div">,
     AsChild {}
@@ -33,7 +29,7 @@ export interface SidebarMenuSubButtonProps
   size?: "md" | "sm";
 }
 
-const sidebarAction = cva({
+export const sidebarAction = cva({
   base: "flex size-5 cursor-pointer items-center justify-center rounded transition outline-none [&>svg]:size-4 [&>svg]:shrink-0",
   compoundVariants: [
     {
@@ -92,21 +88,6 @@ export const SidebarGroup = ({
     {...props}
   />
 );
-
-export const SidebarGroupAction = ({
-  asChild,
-  className,
-  ...props
-}: SidebarGroupActionProps) => {
-  const Component = asChild ? Slot : "button";
-
-  return (
-    <Component
-      className={sidebarAction({ className, variant: "group" })}
-      {...props}
-    />
-  );
-};
 
 export const SidebarGroupContent = ({
   className,

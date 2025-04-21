@@ -86,7 +86,7 @@ export const SheetOverlay = ({
 }: ComponentPropsWithClassName<typeof Overlay>) => (
   <Overlay
     className={cx(
-      "data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out data-[state=open]:fade-in fixed inset-0 z-(--z-popover) bg-white/80 dark:bg-gray-950/80",
+      "data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out data-[state=open]:fade-in fixed inset-0 z-(--z-popover) bg-white/80 backdrop-blur-sm backdrop-saturate-150 dark:bg-gray-950/80",
       className,
     )}
     {...props}

@@ -77,7 +77,7 @@ export const AlertDialogOverlay = ({
 }: AlertDialogOverlayProps) => (
   <Overlay
     className={cx(
-      "data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out data-[state=open]:fade-in fixed inset-0 z-(--z-popover) bg-gray-950/80",
+      "data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out data-[state=open]:fade-in fixed inset-0 z-(--z-popover) bg-gray-950/80 backdrop-blur-sm backdrop-saturate-150",
       className,
     )}
     {...props}

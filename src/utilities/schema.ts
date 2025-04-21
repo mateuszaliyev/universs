@@ -29,7 +29,11 @@ export const feedItem = z.pipe(
     /**
      * Describes a media object that is attached to the item.
      */
-    "enclosure?": string,
+    "enclosure?": z.interface({
+      length: string,
+      type: string,
+      url,
+    }),
     /**
      * A string that uniquely identifies the item.
      */

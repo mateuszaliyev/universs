@@ -33,6 +33,7 @@ export interface FeedItem
     | "contentEncoded"
     | "contentEncodedSnippet"
     | "contentSnippet"
+    | "enclosure"
     | "isoDate"
     | "link"
     | "pubDate"
@@ -70,7 +71,7 @@ export const client = new Dexie("universs") as DatabaseClient;
 
 client.version(1).stores({
   feedItems:
-    "&id, author, content, contentEncoded, contentEncodedSnippet, contentSnippet, feedId, isoDate, link, pubDate, title",
+    "&id, author, content, contentEncoded, contentEncodedSnippet, contentSnippet, enclosure, feedId, isoDate, link, pubDate, title",
   feeds: "&id, description, language, lastBuildDate, link, title, url",
   userFeedItems: "&id, favorite, feedItemId, readLater, userId",
   userFeeds: "&id, favorite, feedId, name, readLater, userId",

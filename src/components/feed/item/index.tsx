@@ -1,3 +1,5 @@
+/* eslint-disable @next/next/no-img-element */
+
 "use client";
 
 import { useMemo } from "react";
@@ -87,6 +89,11 @@ export const FeedItem = ({ id }: { id: FeedItemType["id"] }) => {
         <FeedItemDetails item={userFeedItem.data} />
       </p>
       <div className="prose prose-headings:font-medium prose-headings:tracking-tight prose-img:rounded-lg md:prose-lg prose-zinc dark:prose-invert mt-16">
+        {userFeedItem.data.enclosure && (
+          <figure className="pb-8">
+            <img alt="" src={userFeedItem.data.enclosure.url} />
+          </figure>
+        )}
         {content}
       </div>
     </>

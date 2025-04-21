@@ -7,6 +7,7 @@ import * as z from "@zod/mini";
 
 import { Button } from "@/components/button";
 import { Field, FieldError, FieldInput, FieldLabel } from "@/components/field";
+import { Form } from "@/components/form";
 import { toast, TOAST_DEFAULT_ERROR_MESSAGE } from "@/components/toast";
 
 import { database } from "@/database";
@@ -55,8 +56,8 @@ export const AddFeedForm = () => {
   });
 
   return (
-    <form
-      className="mt-8 flex max-w-md flex-col gap-4"
+    <Form
+      className="mt-8 max-w-md"
       onSubmit={(event) => {
         event.preventDefault();
         event.stopPropagation();
@@ -85,6 +86,6 @@ export const AddFeedForm = () => {
         )}
       </form.Field>
       <Button disabled={form.state.isSubmitting}>Add feed</Button>
-    </form>
+    </Form>
   );
 };

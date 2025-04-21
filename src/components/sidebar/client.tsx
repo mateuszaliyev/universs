@@ -392,7 +392,7 @@ const SidebarMenuButtonInternal = ({
       if (closeOnClick) setSheetOpen(false);
       onClick?.(event);
     },
-    [closeOnClick, setSheetOpen],
+    [closeOnClick, onClick, setSheetOpen],
   );
 
   return (

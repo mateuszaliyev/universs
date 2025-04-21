@@ -12,9 +12,9 @@ export const FeedItemDetails = ({ item }: { item: FeedItem }) =>
     ),
   ]
     .filter(Boolean)
-    .map((element, index) => (
+    .map((element, index, elements) => (
       <Fragment key={index}>
         {element}
-        {index ? null : <span> / </span>}
+        {!index && elements.length > 1 ? <span> / </span> : null}
       </Fragment>
     ));
